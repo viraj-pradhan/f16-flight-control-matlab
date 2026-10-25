@@ -102,7 +102,7 @@ The `run_` files are the entry points. The other files are functions called by t
 ## Author
 
 Viraj Pradhan
-LinkedIn: [add your profile link]
+LinkedIn: www.linkedin.com/in/virajdpradhan
 
 ## License
 
