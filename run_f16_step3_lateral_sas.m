@@ -64,6 +64,8 @@ for i = 1:6
     plot(ax, R_off.t, R_off.(fields{i}), 'LineWidth',1.8);
     plot(ax, R_on.t,  R_on.(fields{i}),  'LineWidth',1.8);
     ylabel(ax,names{i});
+    y = [R_off.(fields{i}); R_on.(fields{i})]; d = max(y) - min(y);
+    ylim(ax, [min(y) - 0.08*d, max(y) + 0.08*d]);
     if i > 4, xlabel(ax,'Time (s)'); end
     if i == 1, legend(ax,{'Dampers off','Yaw + roll damper on'},'Location','best'); end
 end

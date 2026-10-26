@@ -178,6 +178,7 @@ The `run_` files are the entry points. The other files are functions called by t
 | `f16_metrics.m` | Performance numbers for one run |
 | `f16_aero_nasa.m` | NASA TP-1538 aerodynamic tables and interpolation |
 | `f16_dynamics_nasa.m` | 6-DOF model using the NASA tables (same interface as `f16_dynamics.m`, optional `P.xcg`) |
+| `f16_gain_schedule.mat` | Gain tables saved by step 8 |
 | `run_f16_step*.m` | Entry-point scripts listed above |
 
 ## Conventions
@@ -218,7 +219,7 @@ The `run_` files are the entry points. The other files are functions called by t
 ## Author
 
 Viraj Pradhan
-LinkedIn: www.linkedin.com/in/virajdpradhan
+LinkedIn: [linkedin.com/in/virajdpradhan](https://www.linkedin.com/in/virajdpradhan)
 
 ## License
 
