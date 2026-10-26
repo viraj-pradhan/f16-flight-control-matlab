@@ -74,8 +74,25 @@ hp = gobjects(1,numel(body));
 for k = 1:numel(body)
     hp(k) = patch(ax,'Vertices',body{k},'Faces',[1 2 3],'FaceColor',cols{k},'EdgeColor','k','LineWidth',0.5);
 end
-ttl = title(ax,'','Color','k','FontSize',14);
+% on-screen text: a figure overlay is always visible (an axes title can be
+% pushed out of view by the perspective chase camera)
+try, ax.Toolbar.Visible = 'off'; catch, end
+try, disableDefaultInteractivity(ax); catch, end
+hud = annotation(fig,'textbox',[0 0.885 1 0.115],'String','','EdgeColor','none', ...
+      'BackgroundColor','w','FaceAlpha',0.85,'Color','k','FontSize',15, ...
+      'HorizontalAlignment','center','VerticalAlignment','middle','Interpreter','tex');
+annotation(fig,'textbox',[0 0 1 0.05],'String', ...
+      sprintf('Orange: path flown    Grey: path ahead    Jet drawn %dx larger    Playback %dx real time', modelScale, speedUp), ...
+      'EdgeColor','none','BackgroundColor','w','FaceAlpha',0.85,'Color',[0.25 0.25 0.25], ...
+      'FontSize',11,'HorizontalAlignment','center','VerticalAlignment','middle');
+headline = sprintf('F-16 autopilot (%s): +500 ft climb and 30%s turn', upper(ctrl), char(176));
 camproj(ax,'perspective'); camva(ax,30); camup(ax,[0 0 1]);
+if strcmp(camMode,'chase')
+    % axis numbers are meaningless from a moving camera: keep the grid, hide the labels
+    set(ax,'XTickLabel',[],'YTickLabel',[],'ZTickLabel',[]);
+    xlabel(ax,''); ylabel(ax,''); zlabel(ax,'');
+end
+tailFrames = max(2, round(2.5/speedUp*fps));   % chase view: last 2.5 s of path only
 if strcmp(camMode,'overview')
     campos(ax,[mean(xl)+0.9*diff(xl), mean(yl)-1.3*diff(yl), max(zl)*6+3000]);
     camtarget(ax,[mean(xl) mean(yl) mean(zl)]);
@@ -102,7 +119,15 @@ for n = 1:nFrames
         enu = [ned(:,2) + E(n), ned(:,1) + N(n), -ned(:,3) + U(n)];
         set(hp(k),'Vertices',enu);
     end
-    set(trail,'XData',E(1:n),'YData',N(1:n),'ZData',U(1:n));
+    if strcmp(camMode,'chase')
+        % only draw path that is in front of the camera; MATLAB does not clip
+        % lines behind a perspective camera, which shows up as stray streaks
+        i0 = max(1, n - tailFrames);
+        set(trail,'XData',E(i0:n),'YData',N(i0:n),'ZData',U(i0:n));
+        set(trailAll,'XData',E(n:end),'YData',N(n:end),'ZData',U(n:end));
+    else
+        set(trail,'XData',E(1:n),'YData',N(1:n),'ZData',U(1:n));
+    end
 
     if strcmp(camMode,'chase')
         fwd = [sin(psiS(n)) cos(psiS(n)) 0];
@@ -112,8 +137,9 @@ for n = 1:nFrames
     end
 
     hdg = mod(rad2deg(psi(n)),360);
-    set(ttl,'String',sprintf('t = %5.1f s    altitude = %5.0f ft    heading = %5.1f deg    bank = %5.1f deg    speed = %4.0f ft/s', ...
-        tk(n), U(n), hdg, rad2deg(phi(n)), spd(n)));
+    set(hud,'String',{['\bf' headline], ['\rm' sprintf( ...
+        't = %4.1f s     altitude %4.0f ft     heading %5.1f%s     bank %5.1f%s     speed %3.0f ft/s', ...
+        tk(n), U(n), hdg, char(176), rad2deg(phi(n)), char(176), spd(n))]});
     drawnow;
     if makeVideo, writeVideo(vw,getframe(fig)); end
 end
