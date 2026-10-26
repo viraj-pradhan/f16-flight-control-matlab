@@ -10,7 +10,7 @@ cases = struct('name',{'Relaxed stability (F-16 like)','Statically stable'}, ...
                'Cma', {0.10, -0.20});
 
 fig = figure('Color','w','Position',[100 100 1000 700],'Visible','on');
-try, theme(fig,'light'); catch, end          % R2025a+ dark-mode fix (ignored on older MATLAB)
+try theme(fig,'light'); catch, end          % R2025a+ dark-mode fix (ignored on older MATLAB)
 tl  = tiledlayout(fig,3,2,'TileSpacing','compact');
 ax  = arrayfun(@(i) nexttile(tl), 1:6);
 for i = 1:6, hold(ax(i),'on'); grid(ax(i),'on'); end
@@ -71,7 +71,7 @@ fprintf('\nFigure saved to: %s\n', outfile);
 
 % ---------- local functions ----------
 function style_light(fig, tl)
-try, theme(fig,'light'); catch, end
+try theme(fig,'light'); catch, end
 for a = findall(fig,'Type','axes')'
     set(a,'Color','w','XColor','k','YColor','k','GridColor',[0.4 0.4 0.4],'GridAlpha',0.25);
     a.XLabel.Color = 'k';  a.YLabel.Color = 'k';

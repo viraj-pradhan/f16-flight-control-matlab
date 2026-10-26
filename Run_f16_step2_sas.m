@@ -38,7 +38,7 @@ R_cl = simulate(ctrl_cl, x0, tf, P);
 
 % ---- plot ----
 fig = figure('Color','w','Position',[100 100 950 650],'Visible','on');
-try, theme(fig,'light'); catch, end          % R2025a+ dark-mode fix (ignored on older MATLAB)
+try theme(fig,'light'); catch, end          % R2025a+ dark-mode fix (ignored on older MATLAB)
 tl = tiledlayout(fig,2,2,'TileSpacing','compact');
 names  = {'\alpha (deg)','q (deg/s)','Elevator (deg)','n_z (g)'};
 fields = {'alpha','q','de','nz'};
@@ -62,7 +62,7 @@ fprintf('\nFigure saved to: %s\n', outfile);
 
 % ---------- local functions ----------
 function style_light(fig, tl)
-try, theme(fig,'light'); catch, end
+try theme(fig,'light'); catch, end
 for a = findall(fig,'Type','axes')'
     set(a,'Color','w','XColor','k','YColor','k','GridColor',[0.4 0.4 0.4],'GridAlpha',0.25);
     a.XLabel.Color = 'k';  a.YLabel.Color = 'k';

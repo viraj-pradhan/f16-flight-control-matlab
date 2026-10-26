@@ -1,4 +1,4 @@
-function [xdot, out] = f16_dynamics(x, ctrl, P)
+function [xdot, out] = f16_dynamics(x, ctrl, P, wind)
 % Nonlinear 6-DOF F-16 model, body axes, flat earth.
 %
 % x    = [u v w phi theta psi p q r pn pe h pow]'   (13 states)
@@ -8,7 +8,12 @@ function [xdot, out] = f16_dynamics(x, ctrl, P)
 % ctrl = [throttle(0-1); elevator; aileron; rudder]  (surfaces in rad)
 %         elevator: positive = trailing edge down = nose down
 %
+% wind (optional) = [uw vw ww] wind velocity in body axes (ft/s), default [0 0 0].
+%         Used by step 5 for gusts. Existing 3-argument calls are unchanged.
+%
 % xdot = state derivatives, out = struct of useful outputs (alpha, beta, nz...)
+
+if nargin < 4, wind = [0 0 0]; end
 
 ub = x(1); vb = x(2); wb = x(3);
 phi = x(4); th = x(5); psi = x(6);
@@ -21,9 +26,10 @@ da  = min(max(ctrl(3),-P.da_lim),P.da_lim);
 dr  = min(max(ctrl(4),-P.dr_lim),P.dr_lim);
 
 % --- air data (ISA troposphere) ---
-V     = max(sqrt(ub^2+vb^2+wb^2), 1);
-alpha = atan2(wb, ub);
-beta  = asin(vb/V);
+ua = ub - wind(1);  va = vb - wind(2);  wa = wb - wind(3);   % air-relative velocity
+V     = max(sqrt(ua^2+va^2+wa^2), 1);
+alpha = atan2(wa, ua);
+beta  = asin(va/V);
 Tmp   = 518.67 - 3.5662e-3*min(h,36000);          % deg R
 rho   = 0.0023769*(Tmp/518.67)^4.2561;            % slug/ft^3
 a_snd = sqrt(1.4*1716.5*Tmp);
